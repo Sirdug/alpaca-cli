@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/Users/aaron/Desktop/alpaca-cli/.venv/bin/python --version)",
+      "Bash(/Users/aaron/Desktop/alpaca-cli/.venv/bin/pip list *)"
+    ]
+  }
+}
