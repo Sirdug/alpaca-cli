@@ -51,19 +51,21 @@ def load_config() -> dict:
     if not CONFIG_PATH.exists():
         return {"default_profile": "default", "profiles": {}}
     try:
-        with open(CONFIG_PATH) as f:
+        with open(CONFIG_PATH, encoding="utf-8") as f:
             return json.load(f)
-    except (OSError, json.JSONDecodeError) as e:
+    except (OSError, UnicodeError, json.JSONDecodeError) as e:
         raise ConfigError(f"Could not read {CONFIG_PATH}: {e}")
 
 
 def save_config(config: dict) -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
-    with open(CONFIG_PATH, "w") as f:
+    with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2)
         f.write("\n")
-    # Keys live in this file; keep it readable by the owner only.
-    os.chmod(CONFIG_PATH, stat.S_IRUSR | stat.S_IWUSR)
+    # POSIX mode bits restrict access on Linux and macOS. Windows chmod only toggles
+    # the read-only attribute; access there is governed by inherited NTFS ACLs.
+    if os.name != "nt":
+        os.chmod(CONFIG_PATH, stat.S_IRUSR | stat.S_IWUSR)
 
 
 def get_finnhub_key() -> Optional[str]:

@@ -1,7 +1,7 @@
 # Alpaca CLI (unofficial)
 
 A command-line interface for the [Alpaca](https://alpaca.markets/) Trading and
-Market Data APIs, built for macOS. Trade stocks and spot crypto, manage positions and orders,
+Market Data APIs for Linux, macOS, and Windows 11. Trade stocks and spot crypto, manage positions and orders,
 and pull market data from your terminal.
 
 > This is an independent Python implementation inspired by
@@ -12,17 +12,63 @@ and pull market data from your terminal.
 
 ## Install
 
+Run these commands from the repository folder. Use Python 3.12 or newer for
+the CLI and optional MCP server (the core CLI also supports Python 3.9+).
+
+### Linux and macOS (bash/zsh)
+
 ```bash
 python3 -m venv .venv
-.venv/bin/pip install -e .
+source .venv/bin/activate
+python -m pip install -e .
 ```
 
-Then either activate the venv (`source .venv/bin/activate`) or symlink the
-command somewhere on your PATH:
+Activate the environment in each new terminal, or run `.venv/bin/alpaca`
+directly. On Linux, install your distribution's Python venv package if
+`python3 -m venv` reports that venv or ensurepip is missing. Install the CLI
+inside the virtual environment, including on systems with externally managed
+Python installations.
+
+You can also symlink the command into a user-owned directory on your PATH:
 
 ```bash
-ln -sf "$PWD/.venv/bin/alpaca" /usr/local/bin/alpaca
+mkdir -p "$HOME/.local/bin"
+ln -sf "$PWD/.venv/bin/alpaca" "$HOME/.local/bin/alpaca"
+export PATH="$HOME/.local/bin:$PATH"
 ```
+
+### Windows 11 (PowerShell)
+
+Install Python if needed, then open PowerShell in the repository folder:
+
+```powershell
+py -3 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e .
+.\.venv\Scripts\alpaca.exe setup
+.\.venv\Scripts\alpaca.exe doctor
+```
+
+If your Python installation provides `python` instead of `py`, use
+`python -m venv .venv` for the first command. These commands work without
+activating the environment or changing PowerShell's execution policy.
+
+To use the short `alpaca` command for the rest of the current PowerShell session:
+
+```powershell
+$env:Path = "$PWD\.venv\Scripts;$env:Path"
+alpaca --help
+```
+
+All commands below use the same arguments on Linux, macOS, and Windows. You can
+also run `python -m alpaca_cli` using the environment's Python on any platform.
+
+### Optional MCP server
+
+Using the environment's Python, install the extra with
+`python -m pip install -e ".[mcp]"`. Set your MCP client's stdio command to the
+absolute path of `.venv/bin/alpaca-mcp` on Linux/macOS or
+`.venv\Scripts\alpaca-mcp.exe` on Windows. No shell wrapper is needed. The
+server reads the same saved profiles and environment variables as the CLI.
 
 ## Get started
 
@@ -32,9 +78,29 @@ alpaca doctor    # checks config + connectivity
 alpaca account   # balances and buying power
 ```
 
-Keys are stored in `~/.config/alpaca-cli/config.json` (owner-read-only).
+Keys are stored in `~/.config/alpaca-cli/config.json` on Linux/macOS and
+`%USERPROFILE%\.config\alpaca-cli\config.json` on Windows. Existing profiles
+remain at the same location. Set `ALPACA_CONFIG_DIR` to override the directory
+on any platform. Files use UTF-8, including profiles with non-ASCII names.
+On Linux/macOS the file has owner-only read/write permissions (`0600`); on Windows
+access follows the directory's inherited NTFS permissions. Keys are stored as
+plain text, so use a private directory when overriding the location.
 Environment variables `ALPACA_API_KEY` / `ALPACA_SECRET_KEY` override the
 config file.
+
+To set environment credentials for the current terminal session:
+
+```bash
+# Linux / macOS
+export ALPACA_API_KEY="your-key"
+export ALPACA_SECRET_KEY="your-secret"
+```
+
+```powershell
+# Windows PowerShell
+$env:ALPACA_API_KEY = "your-key"
+$env:ALPACA_SECRET_KEY = "your-secret"
+```
 
 ## Everyday commands
 
@@ -141,3 +207,5 @@ alpaca order list --status all --limit 100 --json
 Run `python -m unittest discover -s tests -v` in the CLI environment. Install the
 `mcp` extra (`pip install -e '.[mcp]'`) to include the MCP integration tests. The
 suite blocks network requests and uses mock clients; it never places real or paper orders.
+GitHub Actions runs the suite on Linux (Ubuntu), Windows, and macOS, including MCP tests on
+Python 3.12 and core CLI tests on Python 3.9.

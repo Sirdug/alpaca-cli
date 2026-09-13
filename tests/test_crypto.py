@@ -283,7 +283,7 @@ class CLITests(OfflineTest):
         self.assertIn("$0.000012345", result.output)
 
 
-@unittest.skipIf(mcp_server is None, "Run with .venv-mcp/bin/python to test MCP integration")
+@unittest.skipIf(mcp_server is None, "Install the mcp extra to test MCP integration")
 class MCPTests(OfflineTest):
     def setUp(self):
         super().setUp()
