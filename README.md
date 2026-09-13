@@ -41,6 +41,38 @@ credentials and profiles are preserved. Custom locations are supported via
 `--install-dir "/path/to/environment"` and `--bin-dir "/path/to/bin"`;
 unrelated existing environments and commands are not overwritten.
 
+### Quick install: Windows 11 (PowerShell)
+
+With Python 3.9+ installed, download and run the installer:
+
+```powershell
+Invoke-WebRequest -UseBasicParsing -Uri "https://raw.githubusercontent.com/Sirdug/alpaca-cli/main/install.ps1" -OutFile install.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+& "$env:LOCALAPPDATA\alpaca-cli\Scripts\alpaca.exe" setup
+```
+
+The installer installs the CLI directly from `Sirdug/alpaca-cli` on GitHub.
+It uses Git's credential manager when Git is installed; otherwise it downloads
+a public source archive. Private repositories require Git signed in with access
+to the repository. The raw download command above only works for a public
+repository; for a private repository, obtain `install.ps1` from your authenticated
+checkout or GitHub session and run it with the second command. A standalone copy
+of the script is sufficient. The
+execution-policy override applies only to this PowerShell process. The script
+works in Windows PowerShell 5.1 and PowerShell 7 without administrator access.
+It creates a private environment in `%LOCALAPPDATA%\alpaca-cli` and prints the
+command to add its `Scripts` directory to your current session's PATH.
+
+Add `-Mcp` to install the MCP server (requires Python 3.12+). Its stdio command
+is the absolute path to `%LOCALAPPDATA%\alpaca-cli\Scripts\alpaca-mcp.exe`.
+Use `-Python "C:\path\to\python.exe"` to choose Python and
+`-InstallDir "C:\path\to\environment"` to choose the installation directory.
+The installer automatically tries `py`, then `python`, then `python3`.
+Rerun with the same options to download and install updates. Use `-Ref main`
+to select a branch, tag, or commit (default: `main`). Developers can use
+`-SourceDir "C:\path\to\alpaca-cli"` to install a local checkout instead.
+Existing profiles are preserved, and unrelated environments are not overwritten.
+
 ### Manual installation
 
 Run these commands from the repository folder. Use Python 3.12 or newer for
