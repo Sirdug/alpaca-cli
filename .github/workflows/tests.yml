@@ -23,3 +23,21 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: alpaca --help
       - run: python -m alpaca_cli --version
+      - if: runner.os != 'Windows'
+        name: Check installer syntax
+        run: bash -n install.sh
+      - if: runner.os != 'Windows'
+        name: Test installer
+        shell: bash
+        run: |
+          options=()
+          if [ '${{ matrix.python }}' = '3.12' ]; then options+=(--mcp); fi
+          bash install.sh --python "$(command -v python)" --install-dir "$RUNNER_TEMP/alpaca env" --bin-dir "$RUNNER_TEMP/alpaca bin" "${options[@]}"
+          "$RUNNER_TEMP/alpaca bin/alpaca" --help
+          bash install.sh --python "$(command -v python)" --install-dir "$RUNNER_TEMP/alpaca env" --bin-dir "$RUNNER_TEMP/alpaca bin" "${options[@]}"
+          mkdir "$RUNNER_TEMP/unmanaged"
+          if bash install.sh --install-dir "$RUNNER_TEMP/unmanaged"; then exit 1; fi
+          mkdir "$RUNNER_TEMP/conflicting bin"
+          printf 'existing command' > "$RUNNER_TEMP/conflicting bin/alpaca"
+          if bash install.sh --install-dir "$RUNNER_TEMP/alpaca env" --bin-dir "$RUNNER_TEMP/conflicting bin"; then exit 1; fi
+          test "$(cat "$RUNNER_TEMP/conflicting bin/alpaca")" = 'existing command'

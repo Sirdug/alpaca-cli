@@ -12,6 +12,37 @@ and pull market data from your terminal.
 
 ## Install
 
+### Quick install: macOS and Ubuntu
+
+With Git and Python 3.9+ installed, run:
+
+```bash
+git clone https://github.com/Sirdug/alpaca-cli.git
+cd alpaca-cli
+bash install.sh
+export PATH="$HOME/.local/bin:$PATH"
+alpaca setup
+```
+
+If you already have the repository, run `bash install.sh` from that checkout.
+The installer creates a private environment in `~/.local/share/alpaca-cli`
+and links `alpaca` into `~/.local/bin`. It does not require sudo or alter your
+shell startup files. Add the `export PATH` line to your shell profile to keep
+the command available in new terminals.
+
+For the MCP server too, use Python 3.12+ and run `bash install.sh --mcp`.
+The MCP client's stdio command is the absolute path to
+`~/.local/bin/alpaca-mcp`. Use `--python python3.12` to select a specific Python.
+On Ubuntu, install `python3` and `python3-venv` if needed; on macOS, Python can
+be installed with `brew install python` if you use Homebrew.
+
+Run `git pull` and rerun the installer with the same options to update. Existing
+credentials and profiles are preserved. Custom locations are supported via
+`--install-dir "/path/to/environment"` and `--bin-dir "/path/to/bin"`;
+unrelated existing environments and commands are not overwritten.
+
+### Manual installation
+
 Run these commands from the repository folder. Use Python 3.12 or newer for
 the CLI and optional MCP server (the core CLI also supports Python 3.9+).
 
